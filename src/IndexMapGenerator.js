@@ -29,7 +29,7 @@ export default class SiteMapIndexGenerator {
     }
 
     generateSiteMapUrlElements({
-        sources,
+        sources = [],
         siteUrl,
         pathPrefix,
         resourcesOutput,
