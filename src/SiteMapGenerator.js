@@ -1,4 +1,4 @@
-import assignin from 'lodash.assignin'
+import assignin from 'lodash/assignin'
 import BaseSiteMapGenerator from './BaseSiteMapGenerator'
 
 export default class SiteMapGenerator extends BaseSiteMapGenerator {
