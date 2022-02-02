@@ -1,8 +1,8 @@
-import xml from "xml";
-import dayjs from "dayjs";
-import path from "path";
+import xml from 'xml';
+import dayjs from 'dayjs';
+import path from 'path';
 
-import * as utils from "./utils";
+import * as utils from './utils';
 
 const XMLNS_DECLS = {
     _attr: {

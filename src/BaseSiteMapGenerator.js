@@ -1,15 +1,15 @@
-import sortBy from "lodash/sortBy";
-import xml from "xml";
-import dayjs from "dayjs";
-import path from "path";
+import sortBy from 'lodash/sortBy';
+import xml from 'xml';
+import dayjs from 'dayjs';
+import path from 'path';
 
-import * as utils from "./utils";
+import * as utils from './utils';
 
 // Sitemap specific xml namespace declarations that should not change
 const XMLNS_DECLS = {
     _attr: {
         xmlns: `http://www.sitemaps.org/schemas/sitemap/0.9`,
-        "xmlns:image": `http://www.google.com/schemas/sitemap-image/1.1`,
+        'xmlns:image': `http://www.google.com/schemas/sitemap-image/1.1`,
     },
 };
 
@@ -121,8 +121,8 @@ export default class BaseSiteMapGenerator {
 
         // Create the weird xml node syntax structure that is expected
         imageEl = [
-            { "image:loc": image },
-            { "image:caption": path.basename(image) },
+            { 'image:loc': image },
+            { 'image:caption': path.basename(image) },
         ];
 
         // Return the node to be added to the url xml node
