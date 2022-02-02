@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'path';
 
 // These are the default options which can be overwritten
 // in gatsby-config.js
@@ -28,11 +28,11 @@ const defaultOptions = {
         `/offline-plugin-app-shell-fallback`,
     ],
     createLinkInHead: true,
-}
+};
 
-const PUBLICPATH = `./public`
-const RESOURCESFILE = `/sitemap-:resource.xml`
-const XSLFILE = path.resolve(__dirname, `./static/sitemap.xsl`)
+const PUBLICPATH = `./public`;
+const RESOURCESFILE = `/sitemap-:resource.xml`;
+const XSLFILE = path.resolve(__dirname, `./static/sitemap.xsl`);
 const DEFAULTQUERY = `{
   allSitePage {
     edges {
@@ -48,13 +48,13 @@ const DEFAULTQUERY = `{
       siteUrl
     }
   }
-}`
+}`;
 const DEFAULTMAPPING = {
     allSitePage: {
         sitemap: `pages`,
     },
-}
+};
 
-export default defaultOptions
+export default defaultOptions;
 
-export { DEFAULTMAPPING,DEFAULTQUERY,PUBLICPATH,RESOURCESFILE,XSLFILE }
+export { DEFAULTMAPPING,DEFAULTQUERY,PUBLICPATH,RESOURCESFILE,XSLFILE };

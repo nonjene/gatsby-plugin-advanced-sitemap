@@ -1,16 +1,16 @@
-import React from 'react'
-import { withPrefix } from 'gatsby'
-import defaultOptions from './defaults'
+import React from 'react';
+import { withPrefix } from 'gatsby';
+import defaultOptions from './defaults';
 
 exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {
-    let { output, createLinkInHead } = { ...defaultOptions, ...pluginOptions }
+    let { output, createLinkInHead } = { ...defaultOptions, ...pluginOptions };
 
     if (!createLinkInHead) {
-        return
+        return;
     }
 
     if (output.charAt(0) !== `/`) {
-        output = `/` + output
+        output = `/` + output;
     }
 
     setHeadComponents([
@@ -20,5 +20,5 @@ exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {
             type="application/xml"
             href={withPrefix(output)}
         />,
-    ])
-}
+    ]);
+};

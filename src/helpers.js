@@ -2,16 +2,16 @@
 // with the "real" used ones.
 const getNodePath = (node, allSitePage) => {
     if (!node.path || node.path === `/`) {
-        return node
+        return node;
     }
 
-    const nodePath = allSitePage.get(node.path.replace(/\/$/, ``))
+    const nodePath = allSitePage.get(node.path.replace(/\/$/, ``));
 
     if (getNodePath){
-        node.path = nodePath
+        node.path = nodePath;
     }
 
-    return node
-}
+    return node;
+};
 
-export { getNodePath }
+export { getNodePath };

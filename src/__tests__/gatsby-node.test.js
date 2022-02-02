@@ -1,29 +1,29 @@
-jest.mock(`fs-extra`)
+jest.mock(`fs-extra`);
 
-const fs = require(`fs-extra`)
-const path = require(`path`)
+const fs = require(`fs-extra`);
+const path = require(`path`);
 
-const { onPostBuild } = require(`../gatsby-node`)
-const utils = require(`../utils`)
+const { onPostBuild } = require(`../gatsby-node`);
+const utils = require(`../utils`);
 
-const pathPrefix = ``
+const pathPrefix = ``;
 
 beforeEach(() => {
-    global.__PATH_PREFIX__ = ``
-})
+    global.__PATH_PREFIX__ = ``;
+});
 
 describe(`Test plugin sitemap`, () => {
     it(`default settings work properly`, async () => {
-        utils.writeFile = jest.fn()
-        utils.writeFile.mockResolvedValue(true)
+        utils.writeFile = jest.fn();
+        utils.writeFile.mockResolvedValue(true);
 
-        utils.outputFile = jest.fn()
-        utils.outputFile.mockResolvedValue(true)
+        utils.outputFile = jest.fn();
+        utils.outputFile.mockResolvedValue(true);
 
-        utils.readFile = jest.fn()
-        utils.readFile.mockResolvedValue(true)
+        utils.readFile = jest.fn();
+        utils.readFile.mockResolvedValue(true);
 
-        const graphql = jest.fn()
+        const graphql = jest.fn();
 
         graphql.mockResolvedValue({
             data: {
@@ -51,26 +51,26 @@ describe(`Test plugin sitemap`, () => {
                     ],
                 },
             },
-        })
+        });
 
-        await onPostBuild({ graphql, pathPrefix }, {})
+        await onPostBuild({ graphql, pathPrefix }, {});
 
-        const [filePath] = utils.outputFile.mock.calls[0]
+        const [filePath] = utils.outputFile.mock.calls[0];
 
-        expect(filePath).toEqual(path.join(`public`, `sitemap.xml`))
-    })
+        expect(filePath).toEqual(path.join(`public`, `sitemap.xml`));
+    });
 
     it(`custom query runs`, async () => {
-        utils.writeFile = jest.fn()
-        utils.writeFile.mockResolvedValue(true)
+        utils.writeFile = jest.fn();
+        utils.writeFile.mockResolvedValue(true);
 
-        utils.outputFile = jest.fn()
-        utils.outputFile.mockResolvedValue(true)
+        utils.outputFile = jest.fn();
+        utils.outputFile.mockResolvedValue(true);
 
-        utils.readFile = jest.fn()
-        utils.readFile.mockResolvedValue(true)
+        utils.readFile = jest.fn();
+        utils.readFile.mockResolvedValue(true);
 
-        const graphql = jest.fn()
+        const graphql = jest.fn();
 
         graphql.mockResolvedValue({
             data: {
@@ -98,7 +98,7 @@ describe(`Test plugin sitemap`, () => {
                     ],
                 },
             },
-        })
+        });
 
         const customQuery = `
       {
@@ -115,30 +115,30 @@ describe(`Test plugin sitemap`, () => {
             }
           }
         } 
-    }`
+    }`;
 
         const options = {
             output: `custom-sitemap.xml`,
             serialize: edges => edges.map((edge) => {
-                edge.node.slug = `/post` + edge.node.slug
+                edge.node.slug = `/post` + edge.node.slug;
 
-                return edge
+                return edge;
             }),
             exclude: [`/post/exclude-page`],
             query: customQuery,
-        }
+        };
 
-        await onPostBuild({ graphql, pathPrefix }, options)
+        await onPostBuild({ graphql, pathPrefix }, options);
 
-        const [filePath] = utils.outputFile.mock.calls[0]
+        const [filePath] = utils.outputFile.mock.calls[0];
 
-        expect(filePath).toEqual(path.join(`public`, `custom-sitemap.xml`))
-        expect(graphql).toBeCalledWith(customQuery)
-    })
-})
+        expect(filePath).toEqual(path.join(`public`, `custom-sitemap.xml`));
+        expect(graphql).toBeCalledWith(customQuery);
+    });
+});
 
 describe(`sitemap index`, () => {
-    let graphql = null
+    let graphql = null;
     const queryResult = {
         data: {
             site: {
@@ -165,40 +165,40 @@ describe(`sitemap index`, () => {
                 ],
             },
         },
-    }
+    };
     beforeEach(() => {
-        graphql = jest.fn()
-        graphql.mockResolvedValue(queryResult)
+        graphql = jest.fn();
+        graphql.mockResolvedValue(queryResult);
 
-        fs.createWriteStream.mockReset()
+        fs.createWriteStream.mockReset();
         fs.createWriteStream.mockReturnValue({
             once: jest.fn((event, cb) => cb()),
             write: jest.fn(),
             end: jest.fn(),
-        })
+        });
 
-        fs.statSync.mockReset()
+        fs.statSync.mockReset();
         fs.statSync.mockReturnValue({
             isDirectory: jest.fn(() => true),
-        })
-    })
+        });
+    });
 
     it(`set Prefix to sitemaps`, async () => {
         const options = {
             prefix: `posts/`,
-        }
-        utils.renameFile = jest.fn()
-        utils.renameFile.mockResolvedValue(true)
+        };
+        utils.renameFile = jest.fn();
+        utils.renameFile.mockResolvedValue(true);
 
-        utils.writeFile = jest.fn()
-        utils.writeFile.mockResolvedValue(true)
+        utils.writeFile = jest.fn();
+        utils.writeFile.mockResolvedValue(true);
 
-        utils.outputFile = jest.fn()
-        utils.outputFile.mockResolvedValue(true)
+        utils.outputFile = jest.fn();
+        utils.outputFile.mockResolvedValue(true);
 
-        await onPostBuild({ graphql, pathPrefix }, options)
-        const [sitemap] = utils.outputFile.mock.calls[0]
+        await onPostBuild({ graphql, pathPrefix }, options);
+        const [sitemap] = utils.outputFile.mock.calls[0];
 
-        expect(sitemap).toEqual(path.join(`public`, `sitemap.xml`))
-    })
-})
+        expect(sitemap).toEqual(path.join(`public`, `sitemap.xml`));
+    });
+});

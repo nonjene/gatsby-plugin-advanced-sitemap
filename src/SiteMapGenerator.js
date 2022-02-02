@@ -1,12 +1,12 @@
-import assignin from 'lodash/assignIn'
-import BaseSiteMapGenerator from './BaseSiteMapGenerator'
+import assignin from 'lodash/assignIn';
+import BaseSiteMapGenerator from './BaseSiteMapGenerator';
 
 export default class SiteMapGenerator extends BaseSiteMapGenerator {
     constructor(opts, type) {
-        super()
+        super();
 
-        this.name = type || `pages`
+        this.name = type || `pages`;
 
-        assignin(this, opts)
+        assignin(this, opts);
     }
 }
