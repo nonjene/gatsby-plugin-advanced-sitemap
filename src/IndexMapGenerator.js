@@ -1,5 +1,5 @@
 import xml from 'xml';
-import dayjs from 'dayjs';
+import moment from 'moment';
 import path from 'path';
 
 import * as utils from './utils';
@@ -42,14 +42,14 @@ export default class SiteMapIndexGenerator {
                 ? source.url
                 : new URL(path.join(pathPrefix, filePath), siteUrl).toString();
             const lastModified = source.url
-                ? dayjs(new Date(), this.ISO8601_FORMAT).toISOString()
+                ? moment(new Date(), this.ISO8601_FORMAT).toISOString()
                 : this.types[source.sitemap].lastModified ||
-                  dayjs(new Date(), this.ISO8601_FORMAT).toISOString();
+                  moment(new Date(), this.ISO8601_FORMAT).toISOString();
 
             return {
                 sitemap: [
                     { loc: siteMapUrl },
-                    { lastmod: dayjs(lastModified).toISOString() },
+                    { lastmod: moment(lastModified).toISOString() },
                 ],
             };
         });

@@ -1,6 +1,6 @@
 import sortBy from 'lodash/sortBy';
 import xml from 'xml';
-import dayjs from 'dayjs';
+import moment from 'moment';
 import path from 'path';
 
 import * as utils from './utils';
@@ -62,7 +62,7 @@ export default class BaseSiteMapGenerator {
 
         // force regeneration of xml
         this.siteMapContent = null;
-        this.lastModified = dayjs(new Date());
+        this.lastModified = moment(new Date());
     }
 
     getLastModifiedForDatum(datum) {
@@ -70,9 +70,9 @@ export default class BaseSiteMapGenerator {
             const modifiedDate =
                 datum.updated_at || datum.published_at || datum.created_at;
 
-            return dayjs(new Date(modifiedDate));
+            return moment(new Date(modifiedDate));
         } else {
-            return dayjs(new Date());
+            return moment(new Date());
         }
     }
 
@@ -92,7 +92,7 @@ export default class BaseSiteMapGenerator {
             url: [
                 { loc: url },
                 {
-                    lastmod: dayjs(
+                    lastmod: moment(
                         this.getLastModifiedForDatum(datum),
                         this.ISO8601_FORMAT
                     ).toISOString(),
