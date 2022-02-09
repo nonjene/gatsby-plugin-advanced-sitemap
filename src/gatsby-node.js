@@ -1,10 +1,10 @@
-import path from 'path';
-import _ from 'lodash';
+import path from "path";
+import _ from "lodash";
 
-import defaultOptions from './defaults';
-import Manager from './SiteMapManager';
+import defaultOptions from "./defaults";
+import Manager from "./SiteMapManager";
 
-import * as utils from './utils';
+import * as utils from "./utils";
 
 const PUBLICPATH = `./public`;
 const RESOURCESFILE = `/sitemap-:resource.xml`;
@@ -27,23 +27,31 @@ const DEFAULTQUERY = `{
 }`;
 const DEFAULTMAPPING = {
     allSitePage: {
-        sitemap: `pages`
-    }
+        sitemap: `pages`,
+    },
 };
 let siteURL;
 
-const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput}) => {
+const copyStylesheet = async ({ siteUrl, pathPrefix, indexOutput }) => {
     const siteRegex = /(\{\{blog-url\}\})/g;
 
     // Get our stylesheet template
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
-    const sitemapStylesheet = data.toString().replace(siteRegex, new URL(path.join(pathPrefix, indexOutput), siteUrl).toString());
+    const sitemapStylesheet = data
+        .toString()
+        .replace(
+            siteRegex,
+            new URL(path.join(pathPrefix, indexOutput), siteUrl).toString()
+        );
 
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
-    await utils.writeFile(path.join(PUBLICPATH, `sitemap.xsl`), sitemapStylesheet);
+    await utils.writeFile(
+        path.join(PUBLICPATH, `sitemap.xsl`),
+        sitemapStylesheet
+    );
 };
 
 const serializeMarkdownNodes = (node) => {
@@ -79,7 +87,10 @@ const getNodePath = (node, allSitePage) => {
     const slugRegex = new RegExp(`${node.path.replace(/\/$/, ``)}$`, `gi`);
 
     for (let page of allSitePage.edges) {
-        if (page?.node?.url && page.node.url.replace(/\/$/, ``).match(slugRegex)) {
+        if (
+            page?.node?.url &&
+            page.node.url.replace(/\/$/, ``).match(slugRegex)
+        ) {
             node.path = page.node.url;
             break;
         }
@@ -93,26 +104,26 @@ const getNodePath = (node, allSitePage) => {
 const addPageNodes = (parsedNodesArray, allSiteNodes) => {
     const [parsedNodes] = parsedNodesArray;
     const pageNodes = [];
-    const addedPageNodes = {pages: []};
+    const addedPageNodes = { pages: [] };
 
-    const usedNodes = allSiteNodes.filter(({node}) => {
+    const usedNodes = allSiteNodes.filter(({ node }) => {
         let foundOne;
         for (let type in parsedNodes) {
-            parsedNodes[type].forEach(((fetchedNode) => {
+            parsedNodes[type].forEach((fetchedNode) => {
                 if (node.url === fetchedNode.node.path) {
                     foundOne = true;
                 }
-            }));
+            });
         }
         return foundOne;
     });
 
     const remainingNodes = _.difference(allSiteNodes, usedNodes);
 
-    remainingNodes.forEach(({node}) => {
+    remainingNodes.forEach(({ node }) => {
         addedPageNodes.pages.push({
             url: new URL(node.url, siteURL).toString(),
-            node: node
+            node: node,
         });
     });
 
@@ -121,7 +132,7 @@ const addPageNodes = (parsedNodesArray, allSiteNodes) => {
     return pageNodes;
 };
 
-const serializeSources = ({mapping, additionalSitemaps = []}) => {
+const serializeSources = ({ mapping, additionalSitemaps = [] }) => {
     let sitemaps = [];
 
     for (let resourceType in mapping) {
@@ -134,18 +145,23 @@ const serializeSources = ({mapping, additionalSitemaps = []}) => {
         // and the belonging sources accordingly
         return {
             name: source.name || source.sitemap,
-            sitemap: source.sitemap || `pages`
+            sitemap: source.sitemap || `pages`,
         };
     });
 
     if (Array.isArray(additionalSitemaps)) {
         additionalSitemaps.forEach((addSitemap, index) => {
             if (!addSitemap.url) {
-                throw new Error(`URL is required for additional Sitemap: `, addSitemap);
+                throw new Error(
+                    `URL is required for additional Sitemap: `,
+                    addSitemap
+                );
             }
             sitemaps.push({
-                name: `external-${addSitemap.name || addSitemap.sitemap || `pages-${index}`}`,
-                url: addSitemap.url
+                name: `external-${
+                    addSitemap.name || addSitemap.sitemap || `pages-${index}`
+                }`,
+                url: addSitemap.url,
             });
         });
     }
@@ -155,57 +171,82 @@ const serializeSources = ({mapping, additionalSitemaps = []}) => {
     return sitemaps;
 };
 
-const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r) => {
-    if (r.errors) {
-        throw new Error(r.errors.join(`, `));
-    }
+const runQuery = (handler, { query, mapping, exclude }) =>
+    handler(query).then((r) => {
+        if (r.errors) {
+            throw new Error(r.errors.join(`, `));
+        }
 
-    for (let source in r.data) {
-        // Check for custom serializer
-        if (typeof mapping?.[source]?.serializer === `function`) {
-            if (r.data[source] && Array.isArray(r.data[source].edges)) { 
-                const serializedEdges = mapping[source].serializer(r.data[source].edges);
+        for (let source in r.data) {
+            // Check for custom serializer
+            if (typeof mapping?.[source]?.serializer === `function`) {
+                if (r.data[source] && Array.isArray(r.data[source].edges)) {
+                    const serializedEdges = mapping[source].serializer(
+                        r.data[source].edges
+                    );
 
-                if (!Array.isArray(serializedEdges)) {
-                    throw new Error(`Custom sitemap serializer must return an array`);
+                    if (!Array.isArray(serializedEdges)) {
+                        throw new Error(
+                            `Custom sitemap serializer must return an array`
+                        );
+                    }
+                    r.data[source].edges = serializedEdges;
                 }
-                r.data[source].edges = serializedEdges;
+            }
+
+            // Removing excluded paths
+            if (r.data?.[source]?.edges && r.data[source].edges.length) {
+                r.data[source].edges = r.data[source].edges.filter(
+                    ({ node }) =>
+                        !exclude.some((excludedRoute) => {
+                            const sourceType = node.__typename
+                                ? `all${node.__typename}`
+                                : source;
+                            const slug =
+                                sourceType === `allMarkdownRemark` ||
+                                sourceType === `allMdx` ||
+                                node?.fields?.slug
+                                    ? node.fields.slug.replace(/^\/|\/$/, ``)
+                                    : node.slug.replace(/^\/|\/$/, ``);
+
+                            excludedRoute =
+                                typeof excludedRoute === `object`
+                                    ? excludedRoute
+                                    : excludedRoute.replace(/^\/|\/$/, ``);
+
+                            // test if the passed regular expression is valid
+                            if (typeof excludedRoute === `object`) {
+                                let excludedRouteIsValidRegEx = true;
+                                try {
+                                    new RegExp(excludedRoute);
+                                } catch (e) {
+                                    excludedRouteIsValidRegEx = false;
+                                }
+
+                                if (!excludedRouteIsValidRegEx) {
+                                    throw new Error(
+                                        `Excluded route is not a valid RegExp: `,
+                                        excludedRoute
+                                    );
+                                }
+
+                                return excludedRoute.test(slug);
+                            } else {
+                                return slug.indexOf(excludedRoute) >= 0;
+                            }
+                        })
+                );
             }
         }
 
-        // Removing excluded paths
-        if (r.data?.[source]?.edges && r.data[source].edges.length) {
-            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => { 
-                const sourceType = node.__typename ? `all${node.__typename}` : source;
-                const slug = (sourceType === `allMarkdownRemark` || sourceType === `allMdx`) || (node?.fields?.slug) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``);
-                
-                excludedRoute = typeof excludedRoute === `object` ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ``);
+        return r.data;
+    });
 
-                // test if the passed regular expression is valid
-                if (typeof excludedRoute === `object`) {
-                    let excludedRouteIsValidRegEx = true;
-                    try {
-                        new RegExp(excludedRoute);
-                    } catch (e) {
-                        excludedRouteIsValidRegEx = false;
-                    }
-
-                    if (!excludedRouteIsValidRegEx) {
-                        throw new Error(`Excluded route is not a valid RegExp: `, excludedRoute);
-                    }
-
-                    return excludedRoute.test(slug);
-                } else {
-                    return slug.indexOf(excludedRoute) >= 0;
-                }
-            }));
-        }
-    }
-
-    return r.data;
-});
-
-const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaughtPages}) => {
+const serialize = (
+    { ...sources } = {},
+    { site, allSitePage },
+    { mapping, addUncaughtPages }
+) => {
     const nodes = [];
     const sourceObject = {};
 
@@ -216,13 +257,19 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
             const currentSource = sources[type] ? sources[type] : [];
 
             if (currentSource) {
-                sourceObject[mapping[type].sitemap] = sourceObject[mapping[type].sitemap] || [];
-                currentSource.edges.map(({node}) => {
+                sourceObject[mapping[type].sitemap] =
+                    sourceObject[mapping[type].sitemap] || [];
+                currentSource.edges.map(({ node }) => {
                     if (!node) {
                         return;
                     }
-                    const nodeType = node.__typename ? `all${node.__typename}` : type;
-                    if (nodeType === `allMarkdownRemark` || nodeType === `allMdx`) {
+                    const nodeType = node.__typename
+                        ? `all${node.__typename}`
+                        : type;
+                    if (
+                        nodeType === `allMarkdownRemark` ||
+                        nodeType === `allMdx`
+                    ) {
                         node = serializeMarkdownNodes(node);
                     }
 
@@ -235,7 +282,10 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
                         node.path = node.slug;
                     }
 
-                    if (typeof mapping[type].prefix === `string` && mapping[type].prefix !== ``){
+                    if (
+                        typeof mapping[type].prefix === `string` &&
+                        mapping[type].prefix !== ``
+                    ) {
                         node.path = mapping[type].prefix + node.path;
                     }
 
@@ -244,7 +294,7 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
 
                     sourceObject[mapping[type].sitemap].push({
                         url: new URL(node.path, siteURL).toString(),
-                        node: node
+                        node: node,
                     });
                 });
             }
@@ -269,15 +319,21 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
     return nodes;
 };
 
-exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
+exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
     let queryRecords;
 
     // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
     // to the default `pages` sitemap. Otherwise they will be ignored.
-    const options = pluginOptions.addUncaughtPages ? _.merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
+    const options = pluginOptions.addUncaughtPages
+        ? _.merge(defaultOptions, pluginOptions)
+        : Object.assign({}, defaultOptions, pluginOptions);
 
-    const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
-    const resourcesSitemapFile = path.join(PUBLICPATH, pathPrefix, RESOURCESFILE);
+    const indexSitemapFile = path.join(PUBLICPATH, options.output);
+    const resourcesSitemapFile = path.join(
+        PUBLICPATH,
+        pathPrefix,
+        RESOURCESFILE
+    );
 
     delete options.plugins;
     delete options.createLinkInHead;
@@ -288,10 +344,10 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
     // We always query siteAllPage as well as the site query to
     // get data we need and to also allow not passing any custom
     // query or mapping
-    const defaultQueryRecords = await runQuery(
-        graphql,
-        {query: DEFAULTQUERY, exclude: options.exclude}
-    );
+    const defaultQueryRecords = await runQuery(graphql, {
+        query: DEFAULTQUERY,
+        exclude: options.exclude,
+    });
 
     // Don't run this query when no query and mapping is passed
     if (!options.query || !options.mapping) {
@@ -303,14 +359,16 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
     // Instanciate the Ghost Sitemaps Manager
     const manager = new Manager(options);
 
-    await serialize(queryRecords, defaultQueryRecords, options).forEach((source) => {
-        for (let type in source) {
-            source[type].forEach((node) => {
-                // "feed" the sitemaps manager with our serialized records
-                manager.addUrls(type, node);
-            });
+    await serialize(queryRecords, defaultQueryRecords, options).forEach(
+        (source) => {
+            for (let type in source) {
+                source[type].forEach((node) => {
+                    // "feed" the sitemaps manager with our serialized records
+                    manager.addUrls(type, node);
+                });
+            }
         }
-    });
+    );
 
     // The siteUrl is only available after we have the returned query results
     options.siteUrl = siteURL;
@@ -331,7 +389,7 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
             // for each passed name we want to receive the related source type
             resourcesSiteMapsArray.push({
                 type: type.name,
-                xml: manager.getSiteMapXml(type.sitemap, options)
+                xml: manager.getSiteMapXml(type.sitemap, options),
             });
         }
     });
@@ -346,7 +404,10 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
     }
 
     for (let sitemap of resourcesSiteMapsArray) {
-        const filePath = resourcesSitemapFile.replace(/:resource/, sitemap.type);
+        const filePath = resourcesSitemapFile.replace(
+            /:resource/,
+            sitemap.type
+        );
 
         // Save the generated xml files in the public folder
         try {
