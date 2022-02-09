@@ -101,8 +101,10 @@ var addPageNodes = function addPageNodes(parsedNodesArray, allSiteNodes, siteUrl
   var remainingNodes = (0, _difference.default)(allSiteNodes, usedNodes);
   addedPageNodes.pages = remainingNodes.map(function (_ref3) {
     var node = _ref3.node;
+    var url = new URL(siteUrl);
+    url.pathname = (url.pathname + node.url).replace("//", "/");
     return {
-      url: new URL(node.url, siteUrl).toString(),
+      url: url.toString(),
       node: node
     };
   });
