@@ -74,16 +74,16 @@ yarn-error.log
 node_modules
 
 # Build output
-BaseSiteMapGenerator.js
-IndexMapGenerator.js
-SiteMapGenerator.js
-SiteMapManager.js
-defaults.js
-gatsby-node.js
-gatsby-ssr.js
-utils.js
-helpers.js
-serializers.js
+# BaseSiteMapGenerator.js
+# IndexMapGenerator.js
+# SiteMapGenerator.js
+# SiteMapManager.js
+# defaults.js
+# gatsby-node.js
+# gatsby-ssr.js
+# utils.js
+# helpers.js
+# serializers.js
 
 # Keep the src files
 !src/**/*.js
