@@ -95,14 +95,14 @@ var runQuery = function runQuery(handler, _ref3) {
 
       if ((_r$data = r.data) !== null && _r$data !== void 0 && (_r$data$source = _r$data[source]) !== null && _r$data$source !== void 0 && _r$data$source.edges && r.data[source].edges.length) {
         r.data[source].edges = r.data[source].edges.filter(function (_ref4) {
+          var _node$fields;
+
           var node = _ref4.node;
+          var sourceType = node.__typename ? "all" + node.__typename : source;
+          var slug = sourceType === "allMarkdownRemark" || sourceType === "allMdx" || node !== null && node !== void 0 && (_node$fields = node.fields) !== null && _node$fields !== void 0 && _node$fields.slug ? node.fields.slug : node.slug;
+          var slugCommonic = "/" + slug.replace(/^\/|\/$/g, "") + "/";
           return !exclude.some(function (excludedRoute) {
-            var _node$fields;
-
-            var sourceType = node.__typename ? "all" + node.__typename : source;
-            var slug = sourceType === "allMarkdownRemark" || sourceType === "allMdx" || node !== null && node !== void 0 && (_node$fields = node.fields) !== null && _node$fields !== void 0 && _node$fields.slug ? node.fields.slug.replace(/^\/|\/$/, "") : node.slug.replace(/^\/|\/$/, "");
-            excludedRoute = typeof excludedRoute === "object" ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ""); // test if the passed regular expression is valid
-
+            // test if the passed regular expression is valid
             if (typeof excludedRoute === "object") {
               var excludedRouteIsValidRegEx = true;
 
@@ -116,9 +116,9 @@ var runQuery = function runQuery(handler, _ref3) {
                 throw new Error("Excluded route is not a valid RegExp: ", excludedRoute);
               }
 
-              return excludedRoute.test(slug);
+              return excludedRoute.test(slugCommonic);
             } else {
-              return slug.indexOf(excludedRoute) >= 0;
+              return slugCommonic.indexOf(excludedRoute) >= 0;
             }
           });
         });
