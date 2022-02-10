@@ -236,8 +236,8 @@ exports.onPostBuild = /*#__PURE__*/function () {
             // to the default `pages` sitemap. Otherwise they will be ignored.
             options = pluginOptions.addUncaughtPages ? (0, _merge.default)(_defaults.default, pluginOptions) : Object.assign({}, _defaults.default, pluginOptions);
             options.pathPrefix = options.pathPrefix || pathPrefix;
-            indexSitemapFile = _path.default.join(_defaults.PUBLICPATH, pathPrefix, options.output);
-            resourcesSitemapFile = _path.default.join(_defaults.PUBLICPATH, pathPrefix, _defaults.RESOURCESFILE);
+            indexSitemapFile = _path.default.join(_defaults.PUBLICPATH, options.pathPrefix, options.output);
+            resourcesSitemapFile = _path.default.join(_defaults.PUBLICPATH, options.pathPrefix, _defaults.RESOURCESFILE);
             delete options.plugins;
             delete options.createLinkInHead;
             options.indexOutput = options.output;

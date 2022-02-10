@@ -220,10 +220,14 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
 
     options.pathPrefix = options.pathPrefix || pathPrefix;
 
-    const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
+    const indexSitemapFile = path.join(
+        PUBLICPATH,
+        options.pathPrefix,
+        options.output
+    );
     const resourcesSitemapFile = path.join(
         PUBLICPATH,
-        pathPrefix,
+        options.pathPrefix,
         RESOURCESFILE
     );
 
