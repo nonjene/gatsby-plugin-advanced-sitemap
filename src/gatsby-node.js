@@ -69,23 +69,22 @@ const runQuery = (handler, { query, mapping, exclude }) =>
             // Removing excluded paths
             if (r.data?.[source]?.edges && r.data[source].edges.length) {
                 r.data[source].edges = r.data[source].edges.filter(
-                    ({ node }) =>
-                        !exclude.some((excludedRoute) => {
-                            const sourceType = node.__typename
-                                ? `all${node.__typename}`
-                                : source;
-                            const slug =
-                                sourceType === `allMarkdownRemark` ||
-                                sourceType === `allMdx` ||
-                                node?.fields?.slug
-                                    ? node.fields.slug.replace(/^\/|\/$/, ``)
-                                    : node.slug.replace(/^\/|\/$/, ``);
+                    ({ node }) => {
+                        const sourceType = node.__typename
+                            ? `all${node.__typename}`
+                            : source;
 
-                            excludedRoute =
-                                typeof excludedRoute === `object`
-                                    ? excludedRoute
-                                    : excludedRoute.replace(/^\/|\/$/, ``);
+                        const slug =
+                            sourceType === `allMarkdownRemark` ||
+                            sourceType === `allMdx` ||
+                            node?.fields?.slug
+                                ? node.fields.slug
+                                : node.slug;
 
+                        const slugCommonic =
+                            `/` + slug.replace(/^\/|\/$/g, ``) + `/`;
+
+                        return !exclude.some((excludedRoute) => {
                             // test if the passed regular expression is valid
                             if (typeof excludedRoute === `object`) {
                                 let excludedRouteIsValidRegEx = true;
@@ -102,11 +101,12 @@ const runQuery = (handler, { query, mapping, exclude }) =>
                                     );
                                 }
 
-                                return excludedRoute.test(slug);
+                                return excludedRoute.test(slugCommonic);
                             } else {
-                                return slug.indexOf(excludedRoute) >= 0;
+                                return slugCommonic.indexOf(excludedRoute) >= 0;
                             }
-                        })
+                        });
+                    }
                 );
             }
         }
