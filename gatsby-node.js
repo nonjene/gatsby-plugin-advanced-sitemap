@@ -289,7 +289,7 @@ exports.onPostBuild = /*#__PURE__*/function () {
           case 21:
             // The siteUrl is only available after we have the returned query results
             options.siteUrl = siteURL;
-            options.pathPrefix = pathPrefix;
+            options.pathPrefix = options.pathPrefix || pathPrefix;
             _context2.next = 25;
             return copyStylesheet(options);
 
