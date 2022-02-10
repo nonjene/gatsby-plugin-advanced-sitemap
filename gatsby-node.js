@@ -46,13 +46,13 @@ var copyStylesheet = /*#__PURE__*/function () {
           case 4:
             data = _context.sent;
             url = new URL(siteUrl);
-            url.pathname = (url.pathname + indexOutput).replace("//", "/"); // Replace the `{{blog-url}}` variable with our real site URL
+            url.pathname = (url.pathname.replace(pathPrefix, "") + pathPrefix + indexOutput).replace("//", "/"); // Replace the `{{blog-url}}` variable with our real site URL
 
             sitemapStylesheet = data.toString().replace(siteRegex, url.toString()); // Save the updated stylesheet to the public folder, so it will be
             // available for the xml sitemap files
 
             _context.next = 10;
-            return utils.writeFile(_path.default.join(_defaults.PUBLICPATH, "sitemap.xsl"), sitemapStylesheet);
+            return utils.writeFile(_path.default.join(_defaults.PUBLICPATH, pathPrefix, "sitemap.xsl"), sitemapStylesheet);
 
           case 10:
           case "end":
@@ -235,8 +235,9 @@ exports.onPostBuild = /*#__PURE__*/function () {
             // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
             // to the default `pages` sitemap. Otherwise they will be ignored.
             options = pluginOptions.addUncaughtPages ? (0, _merge.default)(_defaults.default, pluginOptions) : Object.assign({}, _defaults.default, pluginOptions);
-            indexSitemapFile = _path.default.join(_defaults.PUBLICPATH, options.output);
-            resourcesSitemapFile = _path.default.join(_defaults.PUBLICPATH, _defaults.RESOURCESFILE);
+            options.pathPrefix = options.pathPrefix || pathPrefix;
+            indexSitemapFile = _path.default.join(_defaults.PUBLICPATH, pathPrefix, options.output);
+            resourcesSitemapFile = _path.default.join(_defaults.PUBLICPATH, pathPrefix, _defaults.RESOURCESFILE);
             delete options.plugins;
             delete options.createLinkInHead;
             options.indexOutput = options.output;
@@ -244,35 +245,35 @@ exports.onPostBuild = /*#__PURE__*/function () {
             // get data we need and to also allow not passing any custom
             // query or mapping
 
-            _context2.next = 10;
+            _context2.next = 11;
             return runQuery(graphql, {
               query: _defaults.DEFAULTQUERY,
               exclude: options.exclude
             });
 
-          case 10:
+          case 11:
             defaultQueryRecords = _context2.sent;
 
             if (!(!options.query || !options.mapping)) {
-              _context2.next = 15;
+              _context2.next = 16;
               break;
             }
 
             options.mapping = options.mapping || _defaults.DEFAULTMAPPING;
-            _context2.next = 18;
+            _context2.next = 19;
             break;
 
-          case 15:
-            _context2.next = 17;
+          case 16:
+            _context2.next = 18;
             return runQuery(graphql, options);
 
-          case 17:
+          case 18:
             queryRecords = _context2.sent;
 
-          case 18:
+          case 19:
             // Instanciate the Ghost Sitemaps Manager
             manager = new _SiteMapManager.default(options);
-            _context2.next = 21;
+            _context2.next = 22;
             return serialize(queryRecords, defaultQueryRecords, options).forEach(function (source) {
               var _loop3 = function _loop3(type) {
                 source[type].forEach(function (node) {
@@ -286,10 +287,9 @@ exports.onPostBuild = /*#__PURE__*/function () {
               }
             });
 
-          case 21:
+          case 22:
             // The siteUrl is only available after we have the returned query results
             options.siteUrl = siteURL;
-            options.pathPrefix = options.pathPrefix || pathPrefix;
             _context2.next = 25;
             return copyStylesheet(options);
 
