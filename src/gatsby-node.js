@@ -28,7 +28,11 @@ const copyStylesheet = async ({ siteUrl, pathPrefix, indexOutput }) => {
     const data = await utils.readFile(XSLFILE);
 
     const url = new URL(siteUrl);
-    url.pathname = (url.pathname + indexOutput).replace(`//`, `/`);
+    url.pathname = (
+        url.pathname.replace(pathPrefix, ``) +
+        pathPrefix +
+        indexOutput
+    ).replace(`//`, `/`);
 
     // Replace the `{{blog-url}}` variable with our real site URL
     const sitemapStylesheet = data
@@ -38,7 +42,7 @@ const copyStylesheet = async ({ siteUrl, pathPrefix, indexOutput }) => {
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
     await utils.writeFile(
-        path.join(PUBLICPATH, `sitemap.xsl`),
+        path.join(PUBLICPATH, pathPrefix, `sitemap.xsl`),
         sitemapStylesheet
     );
 };
@@ -214,8 +218,14 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
         ? merge(defaultOptions, pluginOptions)
         : Object.assign({}, defaultOptions, pluginOptions);
 
-    const indexSitemapFile = path.join(PUBLICPATH, options.output);
-    const resourcesSitemapFile = path.join(PUBLICPATH, RESOURCESFILE);
+    options.pathPrefix = options.pathPrefix || pathPrefix;
+
+    const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
+    const resourcesSitemapFile = path.join(
+        PUBLICPATH,
+        pathPrefix,
+        RESOURCESFILE
+    );
 
     delete options.plugins;
     delete options.createLinkInHead;
@@ -254,7 +264,6 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
 
     // The siteUrl is only available after we have the returned query results
     options.siteUrl = siteURL;
-    options.pathPrefix = options.pathPrefix || pathPrefix;
 
     await copyStylesheet(options);
 
