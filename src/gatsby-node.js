@@ -41,6 +41,13 @@ const copyStylesheet = async ({ siteUrl, pathPrefix, indexOutput }) => {
 
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
+    console.log(
+        `🗺 Saving sitemapStylesheet to ${path.join(
+            PUBLICPATH,
+            pathPrefix,
+            `sitemap.xsl`
+        )}`
+    );
     await utils.writeFile(
         path.join(PUBLICPATH, pathPrefix, `sitemap.xsl`),
         sitemapStylesheet
@@ -218,7 +225,10 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
         ? merge(defaultOptions, pluginOptions)
         : Object.assign({}, defaultOptions, pluginOptions);
 
-    options.pathPrefix = options.pathPrefix || pathPrefix;
+    options.pathPrefix =
+        typeof options.pathPrefix === `string`
+            ? options.pathPrefix
+            : pathPrefix;
 
     const indexSitemapFile = path.join(
         PUBLICPATH,
@@ -306,6 +316,7 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
 
         // Save the generated xml files in the public folder
         try {
+            console.log(`🗺 Output sitemap file: ${filePath}`);
             await utils.outputFile(filePath, sitemap.xml);
         } catch (err) {
             console.error(err);

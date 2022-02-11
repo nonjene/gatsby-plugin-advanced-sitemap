@@ -51,10 +51,11 @@ var copyStylesheet = /*#__PURE__*/function () {
             sitemapStylesheet = data.toString().replace(siteRegex, url.toString()); // Save the updated stylesheet to the public folder, so it will be
             // available for the xml sitemap files
 
-            _context.next = 10;
+            console.log("\uD83D\uDDFA Saving sitemapStylesheet to " + _path.default.join(_defaults.PUBLICPATH, pathPrefix, "sitemap.xsl"));
+            _context.next = 11;
             return utils.writeFile(_path.default.join(_defaults.PUBLICPATH, pathPrefix, "sitemap.xsl"), sitemapStylesheet);
 
-          case 10:
+          case 11:
           case "end":
             return _context.stop();
         }
@@ -235,7 +236,7 @@ exports.onPostBuild = /*#__PURE__*/function () {
             // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
             // to the default `pages` sitemap. Otherwise they will be ignored.
             options = pluginOptions.addUncaughtPages ? (0, _merge.default)(_defaults.default, pluginOptions) : Object.assign({}, _defaults.default, pluginOptions);
-            options.pathPrefix = options.pathPrefix || pathPrefix;
+            options.pathPrefix = typeof options.pathPrefix === "string" ? options.pathPrefix : pathPrefix;
             indexSitemapFile = _path.default.join(_defaults.PUBLICPATH, options.pathPrefix, options.output);
             resourcesSitemapFile = _path.default.join(_defaults.PUBLICPATH, options.pathPrefix, _defaults.RESOURCESFILE);
             delete options.plugins;
@@ -329,7 +330,7 @@ exports.onPostBuild = /*#__PURE__*/function () {
 
           case 38:
             if (!(_i < _resourcesSiteMapsArr.length)) {
-              _context2.next = 52;
+              _context2.next = 53;
               break;
             }
 
@@ -337,32 +338,33 @@ exports.onPostBuild = /*#__PURE__*/function () {
             filePath = resourcesSitemapFile.replace(/:resource/, sitemap.type); // Save the generated xml files in the public folder
 
             _context2.prev = 41;
-            _context2.next = 44;
+            console.log("\uD83D\uDDFA Output sitemap file: " + filePath);
+            _context2.next = 45;
             return utils.outputFile(filePath, sitemap.xml);
 
-          case 44:
-            _context2.next = 49;
+          case 45:
+            _context2.next = 50;
             break;
 
-          case 46:
-            _context2.prev = 46;
+          case 47:
+            _context2.prev = 47;
             _context2.t1 = _context2["catch"](41);
             console.error(_context2.t1);
 
-          case 49:
+          case 50:
             _i++;
             _context2.next = 38;
             break;
 
-          case 52:
+          case 53:
             return _context2.abrupt("return");
 
-          case 53:
+          case 54:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, null, [[29, 34], [41, 46]]);
+    }, _callee2, null, [[29, 34], [41, 47]]);
   }));
 
   return function (_x2, _x3) {
