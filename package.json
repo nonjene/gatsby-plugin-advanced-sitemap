@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-plugin-advanced-sitemap",
+  "name": "gatsby-plugin-advanced-sitemap-nonjene-hotfix",
   "description": "Advanced plugin for generating configurable XML sitemaps with linked media for better SEO and human-readable XSL templates.",
   "version": "2.1.0",
   "license": "MIT",
@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "@babel/runtime": "7.14.0",
-    "fs-extra": "10.1.0",
-    "lodash": "4.17.21",
+    "fs-extra": "^10.1.0",
+    "lodash": "^4.17.21",
     "moment": "2.29.1",
     "pify": "5.0.0",
     "xml": "^1.0.1"

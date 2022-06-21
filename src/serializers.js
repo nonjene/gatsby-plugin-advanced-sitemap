@@ -1,5 +1,5 @@
-import uniqBy from 'lodash/uniqBy';
-import difference from 'lodash/difference';
+import uniqBy from "lodash/uniqBy";
+import difference from "lodash/difference";
 
 const serializeMarkdownNodes = (node) => {
     if (!node.slug && !node.fields.slug) {
@@ -45,10 +45,15 @@ const serializeSources = ({ mapping, additionalSitemaps = [] }) => {
     if (Array.isArray(additionalSitemaps)) {
         additionalSitemaps.forEach((addSitemap, index) => {
             if (!addSitemap.url) {
-                throw new Error(`URL is required for additional Sitemap: `, addSitemap);
+                throw new Error(
+                    `URL is required for additional Sitemap: `,
+                    addSitemap
+                );
             }
             sitemaps.push({
-                name: `external-${addSitemap.name || addSitemap.sitemap || `pages-${index}`}`,
+                name: `external-${
+                    addSitemap.name || addSitemap.sitemap || `pages-${index}`
+                }`,
                 url: addSitemap.url,
             });
         });
@@ -68,8 +73,10 @@ const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
 
     const usedNodes = allSiteNodes.filter(({ node }) => {
         for (let type in parsedNodes) {
-            let foundOne = parsedNodes[type].find((fetchedNode => node.url === fetchedNode.node.path));
-            if (foundOne){
+            let foundOne = parsedNodes[type].find(
+                (fetchedNode) => node.url === fetchedNode.node.path
+            );
+            if (foundOne) {
                 return true;
             }
         }
@@ -79,8 +86,10 @@ const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
     const remainingNodes = difference(allSiteNodes, usedNodes);
 
     addedPageNodes.pages = remainingNodes.map(({ node }) => {
+        const url = new URL(siteUrl);
+        url.pathname = (url.pathname + node.url).replace(`//`, `/`);
         return {
-            url: new URL(node.url,siteUrl).toString(),
+            url: url.toString(),
             node: node,
         };
     });
